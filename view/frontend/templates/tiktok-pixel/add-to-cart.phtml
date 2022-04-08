@@ -1,0 +1,33 @@
+<?php 
+$currentCurrencyCode = $this->getCurrentCurrencyCode();
+$currentProduct = $this->getCurrentProduct();
+$categoryIds = $currentProduct->getCategoryIds();
+$categoryName = '';
+foreach ($categoryIds as $categoryId){
+    $categoryName = $this->getCategoryName($categoryId);
+    if($categoryName){
+        continue;
+    }
+}
+$productName = $currentProduct->getName();
+$grandTotal = $this->getGrandTotalInCart();
+?>
+<script type="text/javascript">
+require(['jquery'],function($){
+    $(document).ready(function(){
+        $( "#product-addtocart-button").click(function() {
+            //TikTok Pixel Code 
+            let value = parseInt($('#product-price-<?= $currentProduct->getEntityId() ?>').attr('data-price-amount')) + parseInt(<?= number_format($grandTotal, 2, '.', $thousands_sep = ',') ?>);
+            ttq.track('AddToCart',{  
+                content_id: "<?= $currentProduct->getEntityId()?>",
+                quantity: $('#qty').val(),
+                price: $('#product-price-<?= $currentProduct->getEntityId() ?>').attr('data-price-amount'),
+                value: value,
+                currency: "<?= $currentCurrencyCode ?>", 
+            })
+            //End TikTok Pixel Code
+        });
+    });
+});
+   
+</script>

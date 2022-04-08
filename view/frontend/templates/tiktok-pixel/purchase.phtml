@@ -1,0 +1,35 @@
+<?php
+$orderObject = $this->orderObjectSession();
+$orderItems = $this->getOrderItems($orderObject->getEntityId());
+$count = 0;
+foreach ($orderItems as $index => $item) {
+    if (!$item["has_children"]) {
+        $count++;
+    }
+}
+$currentCurrencyCode = $this->getCurrentCurrencyCode();
+$grandTotal = $this->getGrandTotalInCart();
+?>
+<script type="text/javascript">
+    //TikTok Pixel Code
+    ttq.track('CompletePayment',{  
+        contents: [
+            <?php
+                foreach ($orderItems as $index => $item){
+            ?>
+                {
+                    content_id: "<?= $item["product_id"] ?>",
+                    content_type: "product",
+                    content_name: "<?= $item["name"] ?>",
+                    quantity: "<?= number_format($item["qty_ordered"], 0, '.' , $thousands_sep = ',') ?>",
+                    price: "<?= number_format($item["price"], 2, '.' , $thousands_sep = ',') ?>",
+                },
+            <?php
+            }
+            ?>
+        ],
+        value: <?= number_format($orderObject->getBaseGrandTotal(), 2, '.', $thousands_sep = ',') ?>,
+        currency: "<?= $currentCurrencyCode ?>",
+    });
+    //End TikTok Pixel Code
+</script>

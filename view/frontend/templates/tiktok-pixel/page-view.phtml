@@ -1,0 +1,37 @@
+<?php 
+$currentCurrencyCode = $this->getCurrentCurrencyCode();
+$currentProduct = $this->getCurrentProduct();
+// Check User is logged in or not logged in
+$emailCustomerCurr = null;
+$customerSession = $this->isCustomerLoggedIn();
+if($customerSession){
+    $emailCustomerCurr = $this->getEmailCurrCustomer();
+}
+//Get Content Name (Sometime is title page)
+$title = $this->getTitle();
+$pageIdentifier = $this->getFullActionName();
+$grandTotal = $this->getGrandTotalInCart();
+switch ($pageIdentifier) {
+    case 'cms_index_index':
+        $title = 'home';
+        break;
+    case ($pageIdentifier == 'checkout-cart-index' || $pageIdentifier == 'checkout-onepage-index' ):
+        $title = 'checkout';
+        break;
+}
+?>
+<script type="text/javascript">
+require(['jquery'],function($){
+    $(document).ready(function(){
+        //TikTok Pixel Code
+        ttq.track('ViewContent', {
+            content_id: "<?= md5($emailCustomerCurr) ?>",
+            content_name: "<?= $title ?>",
+            currency: "<?= $currentCurrencyCode ?>",
+            value: <?= number_format($grandTotal, 2, '.', $thousands_sep = ',') ?>
+        });
+        //End TikTok Pixel Code
+    });
+});
+   
+</script>
